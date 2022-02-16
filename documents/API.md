@@ -1,3 +1,4 @@
+อ่านแบบ Source นะจะได้อ่านเห็นเว้นวรรคง่ายๆ
 (Link ที่ใส่ไว้ยังดึงไม่ได้นะ แค่ใส่ไว้ก่อน)
 
 ในทุกตัวอย่าง 
@@ -121,7 +122,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/updatecommand
     "mode_status" : 1, # 0 = on/off mode , 1 = เปิด robot mode
     "duration" : 60
 }
-# ตรงนี้ยังไม่แน่ใจว่าระยะเวลาส่งมาเป็นยังไงนะ ถ้าให้แก้ก็บอกได้ด
+ตรงนี้ยังไม่แน่ใจว่าระยะเวลาส่งมาเป็นยังไงนะ ถ้าให้แก้ก็บอกได้ด
 
 - เพิ่มต้นไม้ต้นใหม่ ให้ส่ง HTTPRequest แบบ POST ที่
 https://ecourse.cpe.ku.ac.th/exceed06/api/postnewtree
