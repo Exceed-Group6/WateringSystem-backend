@@ -26,6 +26,19 @@ robot_collection = db["robot_status"]
 tree_collection = db["default_tree"]
 record_collection = db["data_list"]
 
+@app.get("/getrecord/{tree_id}")
+def returnrecord(tree_id : int):
+    tree = record_collection.find_one({"tree_id":tree_id})
+    light = tree["light"]
+    humidity = tree["humidity"]
+    temp = tree["temp"]
+    return{
+        "tree_id" : tree_id,
+        "light" : light,
+        "humidity" : humidity,
+        "temp" : temp
+    }
+  
 @app.get("/getbyid/{tree_id}")
 def returnbyid(tree_id : int):
     robot = robot_collection.find_one({"tree_id" : tree_id})
@@ -53,7 +66,7 @@ def returnbyid(tree_id : int):
             },
     }
 
-@app.get("/getall/")
+@app.get("/getall")
 def returnall():
     all_tree = record_collection.find()
     all = []
