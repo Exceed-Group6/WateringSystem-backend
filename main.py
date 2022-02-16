@@ -26,7 +26,22 @@ robot_collection = db["robot_status"]
 tree_collection = db["default_tree"]
 record_collection = db["data_list"]
 
-@app.get("/command/{tree_id}/")
+@app.delete("/deletetree/{tree_id}")
+def delete_tree(tree_id : int):
+    query = {"tree_id" : tree_id}
+    test = robot_collection.find_one(query)
+    if test == None:
+        return{
+            "result" : "not found"
+        }
+    robot_collection.delete_one(query)
+    tree_collection.delete_one(query)
+    record_collection.delete_one(query)
+    return{
+        "result" : "success"
+    }
+
+@app.get("/command/{tree_id}")
 def returnrobotcommand(tree_id : int):
     cur = robot_collection.find_one({"tree_id" : tree_id})
     return {
@@ -107,4 +122,3 @@ def returnall():
         "res_amount" : len(all),
         "result" : all
     }
-      
