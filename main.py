@@ -52,3 +52,37 @@ def returnbyid(tree_id : int):
             "current" : temp
             },
     }
+
+@app.get("/getall/")
+def returnall():
+    all_tree = record_collection.find()
+    all = []
+    for tree in all_tree:
+        id = tree["tree_id"]
+        tree_info = tree_collection.find_one({"tree_id":id})
+
+        light = tree["light"][41]
+        humidity = tree["humidity"][41]
+        temp = tree["temp"][41]
+        
+        tmp = {
+            "tree_id" : id,
+            "base_light" : {
+                "set" : tree_info["base_light"],
+                "curret" : light
+                },
+            "base_humidity" : {
+                "set" : tree_info["base_humidity"],
+                "current" : humidity
+                },
+            "base_temp" : {
+                "set" : tree_info["base_temp"],
+                "current" : temp
+                },
+        }
+        all.append(tmp)
+    return {
+        "res_amount" : len(all),
+        "result" : all
+    }
+       
