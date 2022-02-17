@@ -153,7 +153,7 @@ def delete_tree(tree_id : int):
 @app.get("/command/{tree_id}")
 def returnrobotcommand(tree_id : int):
     cur = robot_collection.find_one({"tree_id" : tree_id})
-    tree = record_collection.find_one({"tree_id":tree_id})
+    tree = tree_collection.find_one({"tree_id":tree_id})
     if cur == None:
         return{
             "tree_id" : tree_id,
@@ -162,7 +162,7 @@ def returnrobotcommand(tree_id : int):
     return {
         "tree_id" : tree_id,
         "user_info" : 1,
-        "humidity" : tree["humidity"][41],
+        "humidity" : tree["base_humidity"][1],
         "mode_status" : cur["mode_status"],
         "duration" : cur["duration"],
         "user_water" : cur["user_water"]
