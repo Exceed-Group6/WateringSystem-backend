@@ -156,6 +156,7 @@ def returnrobotcommand(tree_id : int):
     tree = record_collection.find_one({"tree_id":tree_id})
     if cur == None:
         return{
+            "tree_id" : tree_id,
             "user_info" : 0
         }
     return {
