@@ -202,3 +202,29 @@ def update(input:input):
     return{
         "result" : "success"
     }
+
+@app.put("/water/{tree_id}")
+def startwatering(tree_id : int):
+    cur = robot_collection.find_one({"tree_id" : tree_id})
+    if cur == None:
+        return{
+            "result" : "no tree found"
+        }
+    else:
+        robot_collection.update_one({"tree_id": tree_id}, {"$set" : {"user_water" : 1}})
+        return{
+            "result" : "success"
+        }
+
+@app.put("/watered/{tree_id}")
+def donewatering(tree_id : int):
+    cur = robot_collection.find_one({"tree_id" : tree_id})
+    if cur == None:
+        return{
+            "result" : "no tree found"
+        }
+    else:
+        robot_collection.update_one({"tree_id": tree_id}, {"$set" : {"user_water" : 0}})
+        return{
+            "result" : "success"
+        }
