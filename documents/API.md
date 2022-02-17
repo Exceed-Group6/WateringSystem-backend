@@ -146,7 +146,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/water/{tree_id}
 
 สำหรับ Hardware
 - อ่านคำสั่งว่าตอนนี้หุ่นยนต์อยู่โหมดไหน ให้ส่ง HTTPRequest แบบ GET ที่
-https://ecourse.cpe.ku.ac.th/exceed06/api/getrecord/{tree_id}
+https://ecourse.cpe.ku.ac.th/exceed06/api/command/{tree_id}
 เรามีต้นไม้้ต้นเดีนว จะดึงที่ต้นที่ 1 ตลอกเลยก็ใส่ {tree_id} เป็น 1 เลยก็น่าจะได้นะ
 จะได้คืนมาแบบนี้ mode_status --> 1 เป็นเปิดบอตรดน้ำ , 0 เป็นกดรดน้ำเอง
               user_info --> 1 เป็นเจอต้นไม้ต้นนั้น , 0 คือยังไม่มีต้นไม้ต้นนั้น
