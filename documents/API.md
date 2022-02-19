@@ -134,6 +134,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/postnewtree
     "base_humidity" : [10,20,30]  ＃List ของ int 3 ตัว
     "base_temp" : [10,20,30] ＃List ของ int 3 ตัว
     "mode_status" : 1 # 0/1 ตามโหมดตั้งต้น
+    "duration" : 10
 }
 
 - สั่งให้รดน้ำต้นไม้ตอนไม่ได้เปิดบอต (คือกดให้รดผ่านเว็ปอะ) ให้ส่ง HTTPRequest แบบ PUT ที่
