@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from typing import Optional
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+import random
 
 app = FastAPI()
 
@@ -53,25 +54,38 @@ class input_tree(BaseModel):
     base_humidity: list
     base_temp: list
     mode_status :  int
+    duration : int
 
 class input_tree_optional(BaseModel):
     tree_id : int
-    name: Optional[str] = None
-    desc: Optional[str] = None
-    base_light: Optional[list] = None
-    base_humidity: Optional[list] = None
-    base_temp: Optional[list] = None
-    mode_status :  Optional[int] = None
+    name: str
+    desc: str
+    base_light: list
+    base_humidity: list
+    base_temp: list
+    mode_status :  int
+    duration : int
 
 class water(BaseModel):
     duration: int
 
 @app.put("/updatecommand")
-def update_robot_status(ro_status : robot_status):
+def update_robot_status(ro_status : input_tree_optional):
     r = jsonable_encoder(ro_status)
     query = {"tree_id": r["tree_id"]}
-    update_status = {"$set" :{"mode_status" :r["mode_status"],"duration" :r["duration"]}}
-    robot_collection.update_one(query, update_status)
+    robot = {
+        "mode_status" : r["mode_status"],
+        "duration" : r["duration"]
+    }
+    tree = {
+        "name" : r["name"],
+        "desc" : r["desc"],
+        "base_light" : r["base_light"],
+        "base_temp" : r["base_temp"],
+        "base_humidity" : r["base_humidity"]
+    }
+    tree_collection.update_one(query, {"$set" : tree})
+    robot_collection.update_one(query, {"$set" : robot})
     return {
         "result" : "update success"
     }
@@ -80,6 +94,18 @@ def update_robot_status(ro_status : robot_status):
 def postnewtree(def_tree: input_tree):
     count = tree_collection.count_documents({}) + 1
     t = jsonable_encoder(def_tree)
+    light_random = []
+    humidity_random = []
+    temp_random = []
+    for i in range(30):
+        tmp = random.randint(700,1000)
+        light_random.append(tmp)
+    for i in range(30):
+        tmp = random.randint(20,80)
+        humidity_random.append(tmp)
+    for i in range(30):
+        tmp = random.randint(20,50)
+        temp_random.append(tmp)
     tree = {
         "tree_id" : count,
         "name" : t["name"],
@@ -91,14 +117,17 @@ def postnewtree(def_tree: input_tree):
     robot = {
         "tree_id" : count,
         "mode_status" : t["mode_status"],
-        "duration" : 0,
+        "duration" : t["duration"],
         "user_water" : 0
     }
     record = {
         "tree_id" : count,
-        "light" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        "humidity" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        "temp" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        # "light" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        # "humidity" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        # "temp" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        "light" : light_random,
+        "humidity" : humidity_random,
+        "temp" : temp_random
     }
     tree_collection.insert_one(tree)
     robot_collection.insert_one(robot)
@@ -239,14 +268,14 @@ def update(input:input):
 
     tree_id = s["tree_id"]
     light = s["light"]
-    humidity = s["humidity"]
+    humidity = round(s["humidity"] / 1024 * 100 , 2)
     temp = s["temp"]
     
     query = {"tree_id" : tree_id}
     
     record = record_collection.find_one(query)
     old_light = record["light"]
-    old_humidity = record["humidity"]
+    old_humidity = (record["humidity"])
     old_temp= record["temp"]
     
     old_light.pop(0)
@@ -270,9 +299,7 @@ def update(input:input):
     }
 
 @app.put("/water/{tree_id}")
-def startwatering(tree_id : int, water : water):
-    w = jsonable_encoder(water)
-    robot_collection.update_one({"tree_id":tree_id}, {"$set" : {"duration": w["duration"]}})
+def startwatering(tree_id : int):
     cur = robot_collection.find_one({"tree_id" : tree_id})
     if cur == None:
         return{
@@ -297,31 +324,33 @@ def donewatering(tree_id : int):
             "result" : "success"
         }
 
-@app.patch("/updatecommand")
-async def test(input : input_tree_optional):
-    tree_id = 0
-    robot_update = {}
-    tree_update = {}
-    for data in input:
-        if data[1] != None:
-            if(data[0] == "tree_id"):
-                tree_id = data[1]
-            if(data[0] == "mode_status"):
-                robot_update["mode_status"] = data[1]
-            else:
-                tree_update[data[0]] = data[1]
-    tree_collection.update_one({"tree_id" : tree_id}, {"$set" : tree_update})
-    robot_collection.update_one({"tree_id" : tree_id}, {"$set" : robot_update})
+# @app.patch("/updatecommand")
+# async def test(input : input_tree_optional):
+#     tree_id = 0
+#     robot_update = {}
+#     tree_update = {}
+#     for data in input:
+#         if data[1] != None:
+#             if(data[0] == "tree_id"):
+#                 tree_id = data[1]
+#             if(data[0] == "mode_status"):
+#                 robot_update["mode_status"] = data[1]
+#             else:
+#                 tree_update[data[0]] = data[1]
+#     tree_collection.update_one({"tree_id" : tree_id}, {"$set" : tree_update})
+#     robot_collection.update_one({"tree_id" : tree_id}, {"$set" : robot_update})
 
 @app.get("/getrecordwater/{tree_id}")
 def returnrecord(tree_id : int):
-    tree = record_collection.find_one({"tree_id":tree_id})
+    record = record_collection.find_one({"tree_id":tree_id})
+    tree = tree_collection.find_one({"tree_id":tree_id})
     data = []
-    humidity = tree["humidity"]
+    humidity = record["humidity"]
+    name = tree["name"]
     for i in range(30):
         data.append({"x" : i+1 , "y" : humidity[i]})
     return{
-        "title" : "soil moisture",
+        "title" : name,
         "titleY" : "soil moisture (%)",
         "prefix" : "%",
         "arraydata" : data #data[ { x: 1, y: 64 } , ...]
@@ -329,13 +358,15 @@ def returnrecord(tree_id : int):
 
 @app.get("/getrecordtemp/{tree_id}")
 def returnrecord(tree_id : int):
-    tree = record_collection.find_one({"tree_id":tree_id})
+    record = record_collection.find_one({"tree_id":tree_id})
+    tree = tree_collection.find_one({"tree_id":tree_id})
     data = []
-    temp = tree["temp"]
+    temp = record["temp"]
+    name = tree["name"]
     for i in range(30):
         data.append({"x" : i+1 , "y" : temp[i]})
     return{
-        "title" : "Temperature",
+        "title" : name,
         "titleY" : "Temperature (°C)",
         "prefix" : "°C",
         "arraydata" : data #data[ { x: 1, y: 64 } , ...]
@@ -343,13 +374,15 @@ def returnrecord(tree_id : int):
 
 @app.get("/getrecordlight/{tree_id}")
 def returnrecord(tree_id : int):
-    tree = record_collection.find_one({"tree_id":tree_id})
+    record = record_collection.find_one({"tree_id":tree_id})
+    tree = tree_collection.find_one({"tree_id":tree_id})
     data = []
-    light = tree["light"]
+    light = record["light"]
+    name = tree["name"]
     for i in range(30):
         data.append({"x" : i+1 , "y" : light[i]})
     return{
-        "title" : "Light Intensity",
+        "title" : name,
         "titleY" : "Light Intensity (lux)",
         "prefix" : "lux",
         "arraydata" : data #data[ { x: 1, y: 64 } , ...]
