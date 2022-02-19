@@ -312,3 +312,45 @@ async def test(input : input_tree_optional):
                 tree_update[data[0]] = data[1]
     tree_collection.update_one({"tree_id" : tree_id}, {"$set" : tree_update})
     robot_collection.update_one({"tree_id" : tree_id}, {"$set" : robot_update})
+
+@app.get("/getrecordwater/{tree_id}")
+def returnrecord(tree_id : int):
+    tree = record_collection.find_one({"tree_id":tree_id})
+    data = []
+    humidity = tree["humidity"]
+    for i in range(30):
+        data.append({"x" : i+1 , "y" : humidity[i]})
+    return{
+        "title" : "soil moisture",
+        "titleY" : "soil moisture (%)",
+        "prefix" : "%",
+        "arraydata" : data #data[ { x: 1, y: 64 } , ...]
+    }
+
+@app.get("/getrecordtemp/{tree_id}")
+def returnrecord(tree_id : int):
+    tree = record_collection.find_one({"tree_id":tree_id})
+    data = []
+    temp = tree["temp"]
+    for i in range(30):
+        data.append({"x" : i+1 , "y" : temp[i]})
+    return{
+        "title" : "Temperature",
+        "titleY" : "Temperature (°C)",
+        "prefix" : "°C",
+        "arraydata" : data #data[ { x: 1, y: 64 } , ...]
+    }
+
+@app.get("/getrecordlight/{tree_id}")
+def returnrecord(tree_id : int):
+    tree = record_collection.find_one({"tree_id":tree_id})
+    data = []
+    light = tree["light"]
+    for i in range(30):
+        data.append({"x" : i+1 , "y" : light[i]})
+    return{
+        "title" : "Light Intensity",
+        "titleY" : "Light Intensity (lux)",
+        "prefix" : "lux",
+        "arraydata" : data #data[ { x: 1, y: 64 } , ...]
+    }
