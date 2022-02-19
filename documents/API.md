@@ -114,18 +114,23 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/deletetree/{tree_id}
         "result" : "success"
 }
 
-- ปรับโหมดและระยะเวฃาของ robot ใหม่ update robot status ให้ส่ง HTTPRequest แบบ PUT ที่
-https://ecourse.cpe.ku.ac.th/exceed06/api/updatecommand
+# อัพเดตต้นไม่
+ที่ https://ecourse.cpe.ku.ac.th/exceed06/api/updatecommand
 ส่งมาเเบบ jason file 
 {
-    "id" : 1,
-    "mode_status" : 1, # 0 = กดรดน้ำเอง , 1 = เปิด robot ให้รดน้ำให้ตามความชื้น
-    "duration" : 60
+    "tree_id" : 1
+    "name" : "Ton mai kung"
+    "desc" : "Ton mai na ruk"
+    "base_light" : [500,700,900]
+    "base_humidity" : [40,50,60]
+    "base_temp" : [30,40,50]
+    "mode_status" : 1
+    "duration" : 20
 }
 ตรงนี้ยังไม่แน่ใจว่าระยะเวลาส่งมาเป็นยังไงนะ ถ้าให้แก้ก็บอกได้ด
 
-- เพิ่มต้นไม้ต้นใหม่ ให้ส่ง HTTPRequest แบบ POST ที่
-https://ecourse.cpe.ku.ac.th/exceed06/api/postnewtree
+# เพิ่มต้นไม้ต้นใหม่ 
+ให้ส่ง HTTPRequest แบบ POST ที่ https://ecourse.cpe.ku.ac.th/exceed06/api/postnewtree
 ส่งมาเเบบ JSON file รูปแบบนี้
 {
     "name" : "new tree"
