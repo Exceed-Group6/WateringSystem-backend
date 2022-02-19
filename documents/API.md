@@ -16,14 +16,14 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/getall
     "res_amount": int,
     "result": [
         {
-            "tree_id": 1,
+            "id": 1,
             "base_light": {
                 "set": [
                     20,
                     30,
                     40
                 ],
-                "curret": 26
+                "current": 26
             },
             "base_humidity": {
                 "set": [
@@ -43,7 +43,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/getall
             }
         },
         {
-            "tree_id": 2,
+            "id": 2,
             "base_light": {
                 "set": [
                     0,
@@ -84,7 +84,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/getbyid/{tree_id}
         "cur_bot_duration" : 60,
         "base_light" : {
                 "set" : [20,30,40],
-                "curret" : 26
+                "current" : 26
                 },
         "base_humidity" : {
             "set" : [20,30,40],
@@ -101,7 +101,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/getrecord/{tree_id}
 โดยเปลี่ยน {tree_id} เป็นไอดีต้นที่ไม่ที่เท่าไหร่ ถ้าอยากเปลี่ยนเป็นส่ง body มาแทนใส่ในลิงค์เลยทักมานะ
 จะได้ข้อมูลคืนมาแบบนี้
 {
-        "tree_id" : 1,
+        "id" : 1,
         "light" : [] list ข้อมูลย้อนหลัง 42 ตัว,
         "humidity" : [] list ข้อมูลย้อนหลัง 42 ตัว,
         "temp" : [] list ข้อมูลย้อนหลัง 42 ตัว,
@@ -118,7 +118,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/deletetree/{tree_id}
 https://ecourse.cpe.ku.ac.th/exceed06/api/updatecommand
 ส่งมาเเบบ jason file 
 {
-    "tree_id" : 1,
+    "id" : 1,
     "mode_status" : 1, # 0 = กดรดน้ำเอง , 1 = เปิด robot ให้รดน้ำให้ตามความชื้น
     "duration" : 60
 }
@@ -128,12 +128,12 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/updatecommand
 https://ecourse.cpe.ku.ac.th/exceed06/api/postnewtree
 ส่งมาเเบบ JSON file รูปแบบนี้
 {
-    "tree_id" : 2
     "name" : "new tree"
     "desc" : "describtion of a tree"
     "base_light" : [10,20,30] ＃List ของ int 3 ตัว
     "base_humidity" : [10,20,30]  ＃List ของ int 3 ตัว
     "base_temp" : [10,20,30] ＃List ของ int 3 ตัว
+    "mode_status" : 1 # 0/1 ตามโหมดตั้งต้น
 }
 
 - สั่งให้รดน้ำต้นไม้ตอนไม่ได้เปิดบอต (คือกดให้รดผ่านเว็ปอะ) ให้ส่ง HTTPRequest แบบ PUT ที่
@@ -155,7 +155,7 @@ https://ecourse.cpe.ku.ac.th/exceed06/api/command/{tree_id}
               
 ถ้าหาต้นไม้ต้นนั้นเจอจะส่ง
 {
-        "tree_id" : 1,
+        "id" : 1,
         "user_info" : 1,
         "humidity" : 70,
         "mode_status" : 0,
