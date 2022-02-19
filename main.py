@@ -53,7 +53,9 @@ class input_tree(BaseModel):
     base_humidity: list
     base_temp: list
     mode_status :  int
-    duration : int
+
+class water(BaseModel):
+    duration: int
 
 @app.put("/updatecommand")
 def update_robot_status(ro_status : robot_status):
@@ -80,7 +82,7 @@ def postnewtree(def_tree: input_tree):
     robot = {
         "tree_id" : count,
         "mode_status" : t["mode_status"],
-        "duration" : t["duration"]
+        "duration" : 0
     }
     record = {
         "tree_id" : count,
@@ -167,7 +169,7 @@ def returnrecord(tree_id : int):
     humidity = tree["humidity"]
     temp = tree["temp"]
     return{
-        "tree_id" : tree_id,
+        "id" : tree_id,
         "light" : light,
         "humidity" : humidity,
         "temp" : temp
@@ -260,7 +262,9 @@ def update(input:input):
     }
 
 @app.put("/water/{tree_id}")
-def startwatering(tree_id : int):
+def startwatering(tree_id : int, water : water):
+    w = jsonable_encoder(water)
+    robot_collection.update_one({"tree_id":tree_id}, {"$set" : {"duration": w["duration"]}})
     cur = robot_collection.find_one({"tree_id" : tree_id})
     if cur == None:
         return{
