@@ -1,7 +1,7 @@
 from pydoc import doc
 from unittest import result
 from pymongo import MongoClient
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.encoders import jsonable_encoder
@@ -54,6 +54,15 @@ class input_tree(BaseModel):
     base_temp: list
     mode_status :  int
 
+class input_tree_optional(BaseModel):
+    tree_id : int
+    name: Optional[str] = None
+    desc: Optional[str] = None
+    base_light: Optional[list] = None
+    base_humidity: Optional[list] = None
+    base_temp: Optional[list] = None
+    mode_status :  Optional[int] = None
+
 class water(BaseModel):
     duration: int
 
@@ -82,13 +91,14 @@ def postnewtree(def_tree: input_tree):
     robot = {
         "tree_id" : count,
         "mode_status" : t["mode_status"],
-        "duration" : 0
+        "duration" : 0,
+        "user_water" : 0
     }
     record = {
         "tree_id" : count,
-        "light" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        "humidity" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        "temp" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        "light" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "humidity" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "temp" : [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     }
     tree_collection.insert_one(tree)
     robot_collection.insert_one(robot)
@@ -107,9 +117,9 @@ def returnall():
         tree_info = tree_collection.find_one({"tree_id":id})
         robot_info = robot_collection.find_one({"tree_id":id})
 
-        light = tree["light"][41]
-        humidity = tree["humidity"][41]
-        temp = tree["temp"][41]
+        light = tree["light"][29]
+        humidity = tree["humidity"][29]
+        temp = tree["temp"][29]
         
         tmp = {
             "id" : id,
@@ -140,9 +150,9 @@ def returnbyid(tree_id : int):
     robot = robot_collection.find_one({"tree_id" : tree_id})
     find = tree_collection.find_one({"tree_id" : tree_id})
     tree = record_collection.find_one({"tree_id":tree_id})
-    light = tree["light"][41]
-    humidity = tree["humidity"][41]
-    temp = tree["temp"][41]
+    light = tree["light"][29]
+    humidity = tree["humidity"][29]
+    temp = tree["temp"][29]
     return{
         "tree_name" : find["name"],
         "tree_desc" : find["desc"],
@@ -189,8 +199,6 @@ def delete_tree(tree_id : int):
         record_collection.delete_one(query)
 
         update1 = robot_collection.find({"tree_id" : {"$gt":tree_id}})
-        update2 = tree_collection.find({"tree_id" : {"$gt":tree_id}})
-        update3 = record_collection.find({"tree_id" : {"$gt":tree_id}})
 
         # robot_collection.update_many({"tree_id" : {"$gt":tree_id}}, {"tree_id" : {"$toInt":"$tree_id"}-1})
         # tree_collection.update_many({"tree_id" : {"$gt":tree_id}}, {"tree_id" : {"$toInt":"$tree_id"}-1})
@@ -288,3 +296,19 @@ def donewatering(tree_id : int):
         return{
             "result" : "success"
         }
+
+@app.patch("/updatecommand")
+async def test(input : input_tree_optional):
+    tree_id = 0
+    robot_update = {}
+    tree_update = {}
+    for data in input:
+        if data[1] != None:
+            if(data[0] == "tree_id"):
+                tree_id = data[1]
+            if(data[0] == "mode_status"):
+                robot_update["mode_status"] = data[1]
+            else:
+                tree_update[data[0]] = data[1]
+    tree_collection.update_one({"tree_id" : tree_id}, {"$set" : tree_update})
+    robot_collection.update_one({"tree_id" : tree_id}, {"$set" : robot_update})
